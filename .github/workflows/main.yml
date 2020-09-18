@@ -1,0 +1,72 @@
+name: Fetch and save data
+
+on:
+  schedule:
+    - cron: 20,30,50 1 * * *
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Save latest price bulletin
+        run: |
+          request_url='https://kalimatimarket.gov.np/priceinfo/dlypricebulletin'
+          user_agent='User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0'
+          content_type='Content-Type: application/x-www-form-urlencoded; charset=UTF-8'
+          request_data="cdate=`date +%m/%d/%Y`&pricetype=W"
+
+          echo "Getting Cookies..."
+          curl -s -o /dev/null -c cookies.txt 'https://kalimatimarket.gov.np/home/language/EN' -H "$user_agent"
+
+          echo "Getting today's wholesale price bulletin in English..."
+          response=$(curl -s -b cookies.txt "$request_url" -H "$user_agent" -H "$content_type" --data-raw "$request_data")
+          status=$?
+
+          if [ $status -eq 0 ]; then
+              response_len=`echo -n $response | wc -m`
+              if [ $response_len -gt 1000 ]; then
+              echo $response > ./en.html
+              else
+                  echo "Data is not ready yet: $response"
+                  exit 1
+              fi
+          else
+              echo "Request failed with Exit code ($status): $response"
+              exit $status
+          fi
+
+          echo "Getting today's wholesale price bulletin in Nepali..."
+          response=$(curl -s "$request_url" -H "$user_agent" -H "$content_type" --data-raw "$request_data")
+          status=$?
+
+          if [ $status -eq 0 ]; then
+              response_len=`echo -n $response | wc -m`
+              if [ $response_len -gt 1000 ]; then
+              echo $response > ./np.html
+              else
+                  echo "Data is not ready yet: $response"
+                  exit 1
+              fi
+          else
+              echo "Request failed with Exit code ($status): $response"
+              exit $status
+          fi
+      - name: git check in
+        env:
+          GIT_OWNER_EMAIL: ${{ secrets.GIT_OWNER_EMAIL }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          git config user.email "$GIT_OWNER_EMAIL"
+          git config user.name "himalay"
+
+          if [[ `git status --porcelain` ]]; then
+            git add en.html np.html
+            git commit -a -m "Update price bulletin"
+            git remote rm origin
+            git remote add origin https://himalay:$PUSH_TOKEN@github.com/tarkari/tarkari.github.io.git
+            git push origin HEAD:master
+          else
+            echo 'Nothing to check in'
+          fi
