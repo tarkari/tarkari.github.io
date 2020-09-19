@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme="dark" lang="en">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -7,23 +7,47 @@
       content="width=device-width,initial-scale=1, maximum-scale=1.0, user-scalable=no"
     />
     <link rel="shortcut icon" href="/icons/icon-96x96.png" />
-    <meta name="theme-color" content="#333" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="icons/icon-72x72.png" />
+    <link rel="apple-touch-icon" href="icons/icon-96x96.png" />
+    <link rel="apple-touch-icon" href="icons/icon-128x128.png" />
+    <link rel="apple-touch-icon" href="icons/icon-144x144.png" />
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="icons/icon-384x384.png" />
+    <link rel="apple-touch-icon" href="icons/icon-512x512.png" />
+    <meta name="apple-mobile-web-app-status-bar" content="#28590c" />
+    <meta name="theme-color" content="#333" />
     <title>तरकारी</title>
     <link rel="stylesheet" href="assets/style.css" />
   </head>
   <body>
-    <div class="logo">
-      <img src="./icons/icon-72x72.png" alt="तरकारी" />
-      <h1>तरकारी</h1>
+    <div class="container">
+      <div class="header">
+        <div class="brand">
+          <img class="logo" src="./icons/icon-128x128.png" alt="तरकारी" />
+          <div>
+            <h1 class="title">तरकारी</h1>
+            <p class="subtitle">दैनिक थोक मूल्य विवरण</p>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="dropbtn">⚙</button>
+          <div id="myDropdown" class="dropdown-content">
+            <label class="switch theme">
+              <input type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+
+            <label class="switch lang">
+              <input type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="root"></div>
     </div>
-    <div class="theme">
-      <label class="theme-switch">
-        <input type="checkbox" checked />
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div id="root"></div>
     <script src="assets/app.js"></script>
   </body>
 </html>
