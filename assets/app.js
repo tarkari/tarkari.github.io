@@ -143,11 +143,14 @@ if ("serviceWorker" in navigator) {
   }
 
   function setTitles(subtitle, date) {
-    var title = lang === "np" ? "तरकारी" : "Tarkari";
+    var isNp = lang === "np";
+    var title = isNp ? "तरकारी" : "Tarkari";
     date = date.replace("-", ", ");
     document.title = title + " - " + subtitle + " (" + date + ")";
     document.querySelector(".title").innerHTML = title;
     document.querySelector(".subtitle").innerHTML =
       subtitle + ' <span class="date">(' + date + ")</span>";
+    document.body.classList.add(lang);
+    document.body.classList.remove(isNp ? "en" : "np");
   }
 })();
