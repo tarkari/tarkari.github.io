@@ -18,9 +18,15 @@ if ("serviceWorker" in navigator) {
   var currentTheme = localStorage.getItem("theme") || "dark";
   var themeSwitch = document.querySelector('.theme input[type="checkbox"]');
   var langSwitch = document.querySelector('.lang input[type="checkbox"]');
-  var currency = { np: "रू", en: "Rs" };
+  var sortNameEl = document.querySelector(".sort-name");
+  var sortPriceEl = document.querySelector(".sort-price");
+  var rootEl = document.querySelector("#root");
+
+  var name = { en: "Commodity Name", np: "कृषि उपज" };
+  var price = { en: "Price", np: "मूल्य" };
   var min = { en: "Min", np: "न्यूनतम" };
   var max = { en: "Max", np: "अधिकतम" };
+  var avg = { en: "Average", np: "‌‌औसत" };
 
   document.documentElement.setAttribute("data-theme", currentTheme);
   fetchData();
@@ -64,13 +70,15 @@ if ("serviceWorker" in navigator) {
     fetchData();
   });
 
+  sortNameEl.addEventListener("click", sortBy(".name"));
+  sortPriceEl.addEventListener("click", sortBy(".price"));
+
   function fetchData() {
     fetch("/" + lang + ".html")
       .then(function (res) {
         return res.text();
       })
       .then(function (html) {
-        var rootEl = document.querySelector("#root");
         var tempDom = Object.assign(document.createElement("div"), {
           innerHTML: html,
         });
@@ -103,27 +111,23 @@ if ("serviceWorker" in navigator) {
               avg: row.children[4].textContent.trim(),
             };
             rootEl.innerHTML +=
-              '<div class="card"><h3>' +
+              '<div class="card"><h3 class="name">' +
               data.name +
-              '</h3><div><div><span class="price">' +
-              currency[lang] +
-              " " +
+              '</h3><div><div><span class="price" title="' +
+              avg[lang] +
+              '">' +
               data.avg +
               '</span><small class="unit">/' +
               data.unit +
               '</small></div><div class="min-max"><span title="' +
               min[lang] +
-              '"><span class="min" ></span> <span class="text">' +
-              currency[lang] +
-              " " +
+              '" class="min">' +
               data.min +
-              '</span></span><span title="' +
+              '</span><span title="' +
               max[lang] +
-              '"><span class="max"></span> <span class="text">' +
-              currency[lang] +
-              " " +
+              '" class="max">' +
               data.max +
-              "</span></span></div></div></div>";
+              "</span></div></div></div>";
           }
         } catch (err) {
           _didIteratorError = true;
@@ -152,5 +156,65 @@ if ("serviceWorker" in navigator) {
       subtitle + ' <span class="date">(' + date + ")</span>";
     document.body.classList.add(lang);
     document.body.classList.remove(isNp ? "en" : "np");
+    sortNameEl.innerHTML = name[lang];
+    sortPriceEl.innerHTML = price[lang];
+  }
+
+  function sortBy(selector) {
+    var ascSortedAttribute = "data-asc";
+    return function () {
+      var isPrice = selector === ".price";
+      var isAsc = rootEl.hasAttribute(ascSortedAttribute);
+      var sortA = isAsc ? -1 : 1;
+      var sortB = isAsc ? 1 : -1;
+
+      sortNameEl.classList = "sort-name";
+      sortPriceEl.classList = "sort-price";
+
+      if (isPrice) {
+        sortPriceEl.classList.add(isAsc ? "desc" : "asc");
+      } else {
+        sortNameEl.classList.add(isAsc ? "desc" : "asc");
+      }
+
+      Array.from(rootEl.children)
+        .sort(function (a, b) {
+          var aText = a.querySelector(selector).innerText;
+          var bText = b.querySelector(selector).innerText;
+          if (isPrice) {
+            var aNumber = langSwitch.checked ? npToEnNumber(aText) : +aText;
+            var bNumber = langSwitch.checked ? npToEnNumber(bText) : +bText;
+            console.log({ aText, bText });
+            return isAsc ? aNumber - bNumber : bNumber - aNumber;
+          } else {
+            return aText > bText ? sortA : sortB;
+          }
+        })
+        .forEach(function (node) {
+          rootEl.appendChild(node);
+        });
+
+      rootEl.toggleAttribute(ascSortedAttribute);
+    };
+  }
+
+  function npToEnNumber(npNumbers) {
+    var numberMap = {
+      "०": 0,
+      "१": 1,
+      "२": 2,
+      "३": 3,
+      "४": 4,
+      "५": 5,
+      "६": 6,
+      "७": 7,
+      "८": 8,
+      "९": 9,
+    };
+    return parseInt(
+      npNumbers.split("").reduce(function (acc, n) {
+        return acc + numberMap[n] || 0;
+      }, "")
+    );
   }
 })();

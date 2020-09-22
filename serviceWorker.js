@@ -1,4 +1,4 @@
-const cacheName = "tarkari-v1.0.1";
+const cacheName = "tarkari-v1.1.0";
 const assets = [
   "/",
   "/index.html",

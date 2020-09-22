@@ -60,6 +60,7 @@ body {
 
 .brand .date {
   font-size: 0.8em;
+  display: inline-block;
 }
 
 .dropbtn {
@@ -169,6 +170,31 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
+.sorting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  font-weight: bold;
+  color: var(--secondary-color);
+  user-select: none;
+}
+
+.sort-name,
+.sort-price {
+  cursor: pointer;
+}
+
+.sort-name.desc:after,
+.sort-price.asc:after {
+  content: " ◣";
+}
+
+.sort-name.asc:after,
+.sort-price.desc:after {
+  content: " ◢";
+}
+
 .card {
   box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
@@ -191,6 +217,14 @@ input:checked + .slider:before {
   color: var(--font-color);
 }
 
+.card .price:before {
+  content: "रू ";
+}
+
+.en .card .price:before {
+  content: "Rs ";
+}
+
 .card .unit {
   color: var(--secondary-color);
   font-size: smaller;
@@ -205,30 +239,23 @@ input:checked + .slider:before {
   position: relative;
 }
 
-.min-max .min {
-  width: 0;
-  height: 0;
-  border-left: 3px solid transparent;
-  border-right: 3px solid transparent;
-  border-bottom: 6px solid #4caf50;
-  position: absolute;
-  top: 0.4em;
+.min-max .min:before {
+  content: "▼रू ";
+  color: #4caf50;
 }
 
-.min-max .max {
-  width: 0;
-  height: 0;
-  border-left: 3px solid transparent;
-  border-right: 3px solid transparent;
-  border-bottom: 6px solid #ff1744;
-  position: absolute;
-  top: 0.4em;
+.en .min-max .min:before {
+  content: "▼Rs ";
+}
+◢ .min-max .max {
+  margin-left: 0.3em;
 }
 
-.en .min-max > span:nth-child(2) {
-  margin-left: 0.5em;
+.min-max .max:before {
+  content: "▲रू ";
+  color: #ff1744;
 }
 
-.min-max .text {
-  padding-left: 0.6em;
+.en .min-max .max:before {
+  content: "▲Rs ";
 }
