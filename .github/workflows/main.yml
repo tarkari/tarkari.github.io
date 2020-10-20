@@ -2,7 +2,7 @@ name: Fetch and save data
 
 on:
   schedule:
-    - cron: 25,30 1 * * *
+    - cron: 15,30,45 1,2 * * *
 
 jobs:
   build:
@@ -16,6 +16,11 @@ jobs:
           user_agent='User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0'
           content_type='Content-Type: application/x-www-form-urlencoded; charset=UTF-8'
           request_data="cdate=`date +%m/%d/%Y`&pricetype=W"
+          last_updated=$(( ($(date +%s) - $(git log -1 --pretty="format:%at" en.html)) / 3600 ))
+
+          if [ $last_updated -lt 2 ]; then
+            exit 0
+          fi
 
           echo "Getting Cookies..."
           curl -s -o /dev/null -c cookies.txt 'https://kalimatimarket.gov.np/home/language/EN' -H "$user_agent"
@@ -30,7 +35,7 @@ jobs:
               echo $response > ./en.html
               else
                   echo "Data is not ready yet: $response"
-                  exit 1
+                  exit 0
               fi
           else
               echo "Request failed with Exit code ($status): $response"
@@ -47,7 +52,7 @@ jobs:
               echo $response > ./np.html
               else
                   echo "Data is not ready yet: $response"
-                  exit 1
+                  exit 0
               fi
           else
               echo "Request failed with Exit code ($status): $response"
